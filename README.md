@@ -12,16 +12,16 @@ the baseline and the adapted model have the same live web-search tool?
 |---|---|
 | Adapted model weights | public: [legmlai/apertus-8b-swiss-insurance](https://huggingface.co/legmlai/apertus-8b-swiss-insurance); all four safetensors shard URLs checked |
 | Evaluation dataset: 300 held-out questions (150 DE / 150 FR) | published: [legmlai/swiss-insurance-eval](https://huggingface.co/datasets/legmlai/swiss-insurance-eval) |
-| Model responses, baseline vs adapted, both with live search | generation running on 2026-10-16; pushed to [legmlai/swiss-insurance-eval-responses](https://huggingface.co/datasets/legmlai/swiss-insurance-eval-responses) as they complete |
+| Model responses, baseline vs adapted, both with live search | published: [legmlai/swiss-insurance-eval-responses](https://huggingface.co/datasets/legmlai/swiss-insurance-eval-responses) (baseline 300, adapted 287) |
 | Training-data samples (format only) | [swiss-insurance-sft-sample](https://huggingface.co/datasets/legmlai/swiss-insurance-sft-sample), [swiss-insurance-pt-sample](https://huggingface.co/datasets/legmlai/swiss-insurance-pt-sample) |
 | Evaluation harness (`make run`, Docker) | implemented: `track_1b/src/evaluate.py`, see below |
-| LLM-judge grading + 20 % human audit | pending, runs after the responses are complete |
+| LLM-judge grading + 20 % human audit | grading done (blind Claude agents, see report section 4); human audit pending |
 | Technical report PDF | draft in `track_1b/technical_report.md`; PDF pending results |
 
-The team reports preliminary correct-answer rates of **95% for the adapted model versus 25% for vanilla instruct**.
-These figures were supplied by Mohamad Alhajar on 16 October 2026 and have not been independently reproduced.
-They are recorded in `track_1b/results/team_reported_preliminary.json`, separately from measured harness outputs.
-No complete scored response file or human-audit result is claimed.
+Measured result (blind Claude-agent grading of whether the main conclusion is right, same 287 questions for both systems):
+**adapted model 65.9% correct versus 42.2% for vanilla Apertus-8B-Instruct** (+23.7 points; German 64.0% vs 50.0%, French 67.9% vs 33.6%).
+Projected to all 300 questions: about 66% versus 42%. Details, the strict-rubric results and limitations are in the
+[technical report](track_1b/technical_report.md), section 4. Human audit is still pending.
 
 The five project Hugging Face repositories are public. See [verified resource links](track_1b/docs/HF_LINKS.md) for checked revisions and file availability. The responses repository still contains its card only at the checked revision; the public evaluation questions contain reference hashes, not reference answers.
 

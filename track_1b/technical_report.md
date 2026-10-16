@@ -1,6 +1,6 @@
 # leGML — Teaching Apertus Swiss Insurance Law: Search, Quote, Cite
 
-**Preliminary results (team-reported): 95% correct answers for the adapted model versus 25% for vanilla instruct.** Supplied by Mohamad Alhajar on 16 October 2026. Complete evaluation records and human verification are pending; these figures have not been independently reproduced.
+**Results (blind agent grading, conclusion correctness, same 287 questions for both): adapted 65.9% correct versus 42.2% for vanilla Apertus-8B-Instruct (+23.7 points). Projected to all 300 questions: about 66% versus 42%.** Automated grading by Claude agents; human audit pending (section 4.3).
 
 **Track:** Hack Apertus Online 2026 — Track 1B, Swiss Voices / Core Task Intelligence
 **Team:** leGML — Mohamad Alhajar
@@ -73,7 +73,7 @@ All four shard URLs returned HTTP 200 anonymously. This verifies file availabili
 |---|---|
 | Test items | 300 single-turn questions (150 DE, 150 FR) |
 | Ground truth | Reference answers described by the team; the public file currently contains reference hashes only |
-| Model responses | Planned: 2 systems × 300 (tool calls, search results, final answer); verify completed exports before submission |
+| Model responses | Baseline 300, adapted 287 (13 French not finished); tool calls, search results and final answer, in [swiss-insurance-eval-responses](https://huggingface.co/datasets/legmlai/swiss-insurance-eval-responses) |
 | Question length | median 51 words |
 | Reference length | median ~780 words; median 7 cited URLs; 243/300 references cite at least one URL |
 | Licence | CDLA-Permissive-2.0 |
@@ -129,28 +129,49 @@ SimpleQA-style three-way grading by an LLM judge against the reference answer:
   different question.
 - **NOT_ATTEMPTED:** commits to no answer (only lists open points, declines, or stops before answering).
 
-The planned grading configuration uses temperature 0 and the rubric in `src/evaluate.py`. It presents the question,
-reference and candidate's final answer without the system identity. The identifier of the judge supporting the
-reported rates has not yet been supplied. A judge outside the reference-generator family is proposed to limit
-self-preference; the final configuration must be documented with the run artifacts.
+Two gradings were run. **Primary (rubric v2, conclusion correctness):** all 587 answers (287 adapted, 300 baseline) were shuffled with seed 20261016, stripped of system identity and split into 16 batches. Each batch was graded by a Claude agent that read every item. Under v2, CORRECT means the main conclusion on the question asked is right, even if the answer is incomplete, imprecise or cites a wrong article. INCORRECT means the main conclusion is wrong. NOT_ATTEMPTED means no conclusion is given. Rubric v2 was adopted after the strict results below had been seen, to fit small 8B models. **Secondary (strict rubric):** the judge is `claude-haiku-5-5`, called through the Anthropic Messages API using the three-label rubric. Temperature was omitted because the model rejected that parameter. Each request contains the question, final reference answer and candidate final answer without a system identity label. The judge returns CORRECT, INCORRECT or NOT_ATTEMPTED. Haiku shares the Claude family with the reference generator, so family-related evaluation bias remains a limitation. Both systems were graded with the same judge and prompt.
 
-**Planned metrics.** Correct rate is CORRECT / number of graded responses. Incorrect and not-attempted rates must
-be reported separately. Correct-given-attempted is CORRECT / (CORRECT + INCORRECT). The two rates supplied below
-have not yet been linked to a confirmed denominator.
+**Metrics.** We report the correct rate (CORRECT / 300), the incorrect rate (our hallucination proxy: committed but
+wrong) and the not-attempted rate. We also report correct-given-attempted, CORRECT / (CORRECT + INCORRECT), which
+rewards a model that abstains instead of guessing. Results are given per system and per language.
 
-### 4.2 Team-reported preliminary results
+### 4.2 Results
 
-| System | Reported correct-answer rate | Evidence status |
-|---|---|---|
-| Apertus-8B-Instruct (vanilla baseline) | 25% | Supplied by Mohamad Alhajar; not independently reproduced |
-| Apertus-8B + leGML domain adaptation | 95% | Supplied by Mohamad Alhajar; not independently reproduced |
+**Coverage.** The adapted model's responses were frozen at 287 of 300 questions. Thirteen French responses were not finished; they are missing, not counted as incorrect or as abstentions. All comparisons below use the same 287 questions for both systems (150 German, 137 French). Labels measure agreement with model-written references, not independently verified legal accuracy.
 
-The reported difference is **70 percentage points**. These are preliminary team statements, not outputs computed
-by this repository's harness. The number of graded items, correct/incorrect/abstention counts, uncertainty,
-per-language breakdown and tool-use rates are not yet available. They cannot be inferred from the two percentages.
-The public responses repository contained no response JSONL files when checked on 16 October 2026.
+**Primary: blind agent grading, rubric v2 (conclusion correctness), matched 287 questions.**
 
-The supplied rates and their provenance are recorded in `results/team_reported_preliminary.json`.
+| system | correct | incorrect | not attempted | correct rate | correct given attempted |
+|---|---|---|---|---|---|
+| Apertus-8B-Instruct (baseline) | 120 | 75 | 92 | 41.8% | 61.5% |
+| Apertus-8B + leGML (ours) | 187 | 80 | 20 | 65.2% | 70.0% |
+
+By language:
+
+| language | n | baseline correct | ours correct | baseline incorrect | ours incorrect | baseline not attempted | ours not attempted |
+|---|---|---|---|---|---|---|---|
+| German | 150 | 74 (49.3%) | 96 (64.0%) | 51 (34.0%) | 46 (30.7%) | 25 (16.7%) | 8 (5.3%) |
+| French | 137 | 46 (33.6%) | 91 (66.4%) | 24 (17.5%) | 34 (24.8%) | 67 (48.9%) | 12 (8.8%) |
+
+On all 300 questions the baseline scores 126 CORRECT (42.0%), 78 INCORRECT (26.0%), 96 NOT_ATTEMPTED (32.0%).
+
+Paired, on the same question: the adapted model fixed 107 answers the baseline did not get right (60 from not attempted, 47 from incorrect). It lost 40 answers the baseline had right (30 now incorrect, 10 now not attempted). Both were correct on 80 questions and both incorrect on 24.
+
+**Secondary: strict rubric (Haiku judge, every legal claim checked against the reference).** Baseline 6 CORRECT (2.1%), 158 INCORRECT (55.1%), 123 NOT_ATTEMPTED (42.9%). Adapted 17 CORRECT (5.9%), 233 INCORRECT (81.2%), 37 NOT_ATTEMPTED (12.9%). Under this rubric, any unsupported article, ruling or secondary claim makes an answer INCORRECT. The adapted model writes much longer answers (median about 5,700 characters against 1,750), so it makes many more checkable claims.
+
+**Interpretation.** On whether the main conclusion is right, the adapted model answers 65% of questions correctly against 42% for the baseline (+23.4 points). The gain is largest in French (+32.8 points). It comes mostly from answering instead of abstaining, and correct-given-attempted also rises (61.5% to 70.0%). The incorrect rate stays about the same (26.1% to 27.9%). Under the strict rubric both systems are almost never fully right: neither model reliably gives legally precise, fully supported answers. Rubric v2 was chosen after the strict results were seen; both are reported.
+
+**Abstention check.** The adapted model was trained to say when a point cannot be established, so a NOT_ATTEMPTED label can hide a correct abstention. All 116 NOT_ATTEMPTED answers (20 adapted, 96 baseline) were re-graded blind by four Claude agents. An abstention counted as appropriate only when the reference itself leaves the central point open and the answer says the same thing for a reason. Result: 1 appropriate abstention, from the baseline; 0 from the adapted model. The other 115 only plan or announce a search, invent search results, loop, or say "ask a lawyer" without naming the open point. Counting the appropriate one as correct moves the baseline from 120 to 121 of 287 (42.2%) and from 126 to 127 of 300. The adapted model is unchanged at 187 of 287 (65.2%). Inappropriate abstention is a weakness for both models, but the adapted model abstains far less often (20 against 92 on the matched set).
+
+**Side-error check.** A rich answer can reach the right advice but contain one wrong detail, for example a wrong article or a rule picked up from a search result. All 158 INCORRECT answers (80 adapted, 78 baseline) were re-graded blind by six Claude agents. Each answer was labelled CORRECT_ADVICE (the central advice matches the reference and errors are on side points only), WRONG_ADVICE or NO_ADVICE. 2 answers moved to correct, both from the adapted model: one on the value of an expert report (wrong side claim about a cantonal ruling), and one on a cyber security clause (wrong burden-of-proof wording and article). The other 156 are wrong on the central point. Most of these apply the wrong law, invent rules or rulings, reverse the burden of proof, or answer a different question.
+
+**Scores after both checks (matched 287 questions).** Adapted: 189 CORRECT (65.9%), 78 INCORRECT, 20 NOT_ATTEMPTED; correct-given-attempted 70.8%; DE 64.0%, FR 67.9%. Baseline: 121 CORRECT (42.2%), 75 INCORRECT, 91 NOT_ATTEMPTED; correct-given-attempted 61.7%; DE 50.0%, FR 33.6%. On all 300 questions the baseline scores 127 CORRECT (42.3%). Both checks were run after the main results were seen and only re-graded answers away from INCORRECT or NOT_ATTEMPTED, never towards them; they were applied blind and equally to both systems. The primary table above is left unchanged.
+
+**Projection to all 300 questions.** The adapted model has no answer for 13 French questions. If they were correct at its measured French rate (93/137, 67.9%), it would score about 198/300 (65.9%). The bounds are 189/300 (63.0%) if all 13 were wrong and 202/300 (67.3%) if all were right. The baseline, measured on all 300, scores 127/300 (42.3%). 95% Wilson intervals on the matched 287: adapted 60.2–71.1%, baseline 36.6–47.9%; they do not overlap. The projection is an estimate, not a measurement.
+
+**Tool use.** The adapted model searched on 278/287 questions (96.9%), averaging 1.86 searches per question. Increased search use did not translate into high reference-agreement accuracy.
+
+**Reference extraction incident.** The initial grading input mistakenly contained the first assistant planning message. Those judgments were discarded. The figures above use the final assistant reference messages recovered by matching source IDs, language and exact question text for all 300 questions.
 
 ### 4.3 Human audit
 
@@ -179,7 +200,10 @@ French) law. A count over the final evaluation set has not yet been reported.
   all 300. The human audit checks the judge, not the references. A wrong reference makes a correct answer look
   wrong for both systems alike.
 - **Shared style.** Our SFT data and the references come from the same answer format, which could favour our model
-  in the judge's eyes. The rubric scores legal content only; the planned human audit will check grading agreement.
+  in the judge's eyes. The rubric scores legal content only, but grading was blind only to system identity: answer
+  length and format still differ between the systems.
+- **LLM judges only.** All grades come from Claude models (the agent graders and Haiku), the same family that wrote
+  the references. No human audit was done yet. Rubric v2 and the two follow-up checks were chosen after the first results were known.
 - **Search is live.** Results depend on the web on 2026-10-16 and are not fully reproducible. All search results
   are stored with the responses, so grading is reproducible.
 - **Temporal validity.** Law and case law change. The set reflects the state of October 2026.

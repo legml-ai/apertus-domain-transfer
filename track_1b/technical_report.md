@@ -1,5 +1,7 @@
 # leGML — Teaching Apertus Swiss Insurance Law: Search, Quote, Cite
 
+**Preliminary results (team-reported): 95% correct answers for the adapted model versus 25% for vanilla instruct.** Supplied by Mohamad Alhajar on 16 October 2026. Complete evaluation records and human verification are pending; these figures have not been independently reproduced.
+
 **Track:** Hack Apertus Online 2026 — Track 1B, Swiss Voices / Core Task Intelligence
 **Team:** leGML — Mohamad Alhajar
 **Repository:** https://github.com/legml-ai/apertus-domain-transfer
@@ -70,7 +72,7 @@ All four shard URLs returned HTTP 200 anonymously. This verifies file availabili
 | | |
 |---|---|
 | Test items | 300 single-turn questions (150 DE, 150 FR) |
-| Ground truth | one sourced reference answer per question, with verbatim quotes and URLs |
+| Ground truth | Reference answers described by the team; the public file currently contains reference hashes only |
 | Model responses | Planned: 2 systems × 300 (tool calls, search results, final answer); verify completed exports before submission |
 | Question length | median 51 words |
 | Reference length | median ~780 words; median 7 cited URLs; 243/300 references cite at least one URL |
@@ -127,38 +129,40 @@ SimpleQA-style three-way grading by an LLM judge against the reference answer:
   different question.
 - **NOT_ATTEMPTED:** commits to no answer (only lists open points, declines, or stops before answering).
 
-The judge is {{JUDGE_MODEL}}, at temperature 0, with the rubric in `src/evaluate.py`. It sees the question, the
-reference and the candidate's final answer, but not which system produced it. The judge is chosen outside the
-model family that wrote the references, to limit self-preference.
+The planned grading configuration uses temperature 0 and the rubric in `src/evaluate.py`. It presents the question,
+reference and candidate's final answer without the system identity. The identifier of the judge supporting the
+reported rates has not yet been supplied. A judge outside the reference-generator family is proposed to limit
+self-preference; the final configuration must be documented with the run artifacts.
 
-**Metrics.** We report the correct rate (CORRECT / 300), the incorrect rate (our hallucination proxy: committed but
-wrong) and the not-attempted rate. We also report correct-given-attempted, CORRECT / (CORRECT + INCORRECT), which
-rewards a model that abstains instead of guessing. Results are given per system and per language.
+**Planned metrics.** Correct rate is CORRECT / number of graded responses. Incorrect and not-attempted rates must
+be reported separately. Correct-given-attempted is CORRECT / (CORRECT + INCORRECT). The two rates supplied below
+have not yet been linked to a confirmed denominator.
 
-### 4.2 Results
+### 4.2 Team-reported preliminary results
 
-| system | correct | incorrect | not attempted | correct rate | correct given attempted |
-|---|---|---|---|---|---|
-| Apertus-8B-Instruct (baseline) | {{C_BASE}} | {{I_BASE}} | {{NA_BASE}} | {{CR_BASE}} | {{CGA_BASE}} |
-| Apertus-8B + leGML (ours) | {{C_OURS}} | {{I_OURS}} | {{NA_OURS}} | {{CR_OURS}} | {{CGA_OURS}} |
+| System | Reported correct-answer rate | Evidence status |
+|---|---|---|
+| Apertus-8B-Instruct (vanilla baseline) | 25% | Supplied by Mohamad Alhajar; not independently reproduced |
+| Apertus-8B + leGML domain adaptation | 95% | Supplied by Mohamad Alhajar; not independently reproduced |
 
-By language: {{TABLE_BY_LANGUAGE}}
+The reported difference is **70 percentage points**. These are preliminary team statements, not outputs computed
+by this repository's harness. The number of graded items, correct/incorrect/abstention counts, uncertainty,
+per-language breakdown and tool-use rates are not yet available. They cannot be inferred from the two percentages.
+The public responses repository contained no response JSONL files when checked on 16 October 2026.
 
-**Tool use.** The baseline called `web_search` in {{BASE_SEARCH_RATE}} of questions; on its first 110 answers it
-searched 3 times. Ours searched in {{OURS_SEARCH_RATE}}, with a mean of {{OURS_SEARCHES_MEAN}} searches per question.
+The supplied rates and their provenance are recorded in `results/team_reported_preliminary.json`.
 
 ### 4.3 Human audit
 
-**Pending.** Draw a random 20% of completed judgements with seed {{AUDIT_SEED}}, and have them labelled independently
-by a human annotator ({{AUDITOR}}) who does not see the judge label. If all 600 responses are graded, this requires
-120 audited judgements across the two systems; report the actual sampling frame and coverage. Judge–human
-agreement: {{AGREEMENT}} (Cohen's κ {{KAPPA}}). Add real disagreements and adjudication to `results/human_audit.csv`
-before replacing this paragraph with completed-review results.
+**Pending; no completed audit is claimed.** Draw a random 20% of completed judgements with a recorded seed and
+have them labelled independently by a human who does not see the judge label. If all 600 responses are graded,
+this requires 120 audited judgements across the two systems. Record the actual sampling frame, reviewer,
+agreement, Cohen's kappa, disagreements and adjudication in `results/human_audit.csv`.
 
 ### 4.4 Error analysis
 
-We observed the following failure modes of the adapted model in pilot runs. Their frequency over the full set is
-{{ERROR_COUNTS}}.
+The project team describes the following failure modes from pilot runs. Their frequency over the final set has
+not yet been reported.
 - **Under-searching:** it plans 3–4 searches, then runs only 1, so the answer rests on a single result page.
 - **Wrong instrument:** for example, it applied the Lugano Convention to a US judgment, although the US is not a
   party.
@@ -167,7 +171,7 @@ We observed the following failure modes of the adapted model in pilot runs. Thei
 - **Malformed tool call:** an announced search that is never emitted.
 
 The baseline's typical failure is a short answer from memory with no source. Some of these cite foreign (German or
-French) law. {{BASE_FOREIGN_LAW_COUNT}}
+French) law. A count over the final evaluation set has not yet been reported.
 
 ## 5. Limitations
 
@@ -208,7 +212,8 @@ make run      # Docker; downloads the datasets, re-scores committed judgements, 
   **Pending:** commit the actual judgements and results, and verify this workflow from a clean checkout.
 - With a judge endpoint in `track_1b/.env` (`LLM_NAME`, `LLM_BASE_URL`, `LLM_API_KEY`, any OpenAI-compatible API),
   it grades any response without a cached judgement. New systems are added by uploading a responses file.
-- Pinned versions: dataset revisions `cc48f5d` and {{RESPONSES_REVISION}}, code commit {{COMMIT}}.
+- Questions revision checked: `cc48f5d`. Evaluation code reviewed at `21fc286`. A complete response-data revision
+  and final evidence bundle have not yet been frozen.
 - Regenerating the model responses is not part of `make run`. It needs a GPU with at least 40 GB and the search
   backend. The settings are listed in section 2.
 

@@ -18,7 +18,10 @@ the baseline and the adapted model have the same live web-search tool?
 | LLM-judge grading + 20 % human audit | pending, runs after the responses are complete |
 | Technical report PDF | draft in `track_1b/technical_report.md`; PDF pending results |
 
-No scores are claimed until `track_1b/results/results.json` is committed.
+The team reports preliminary correct-answer rates of **95% for the adapted model versus 25% for vanilla instruct**.
+These figures were supplied by Mohamad Alhajar on 16 October 2026 and have not been independently reproduced.
+They are recorded in `track_1b/results/team_reported_preliminary.json`, separately from measured harness outputs.
+No complete scored response file or human-audit result is claimed.
 
 The five project Hugging Face repositories are public. See [verified resource links](track_1b/docs/HF_LINKS.md) for checked revisions and file availability. The responses repository still contains its card only at the checked revision; the public evaluation questions contain reference hashes, not reference answers.
 

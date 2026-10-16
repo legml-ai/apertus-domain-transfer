@@ -6,7 +6,7 @@
 **Event:** Online
 **Team:** leGML — Mohamad Alhajar; confirm additional members
 **Repository:** https://github.com/legml-ai/apertus-domain-transfer
-**Dataset:** TODO — public Hugging Face URL and revision
+**Dataset:** https://huggingface.co/datasets/legmlai/swiss-insurance-eval (questions), https://huggingface.co/datasets/legmlai/swiss-insurance-eval-responses (responses); revision pinned at submission
 **Demo / notebook:** TODO if available
 **Final PDF:** `leGML_Report.pdf`, at most six pages excluding references
 
@@ -14,11 +14,11 @@
 
 ### Use of Apertus
 
-- **Baseline model and exact revision:** TODO.
-- **Adapted model/adapter and exact revision:** TODO.
-- **Adaptation method and training configuration:** TODO.
-- **Serving stack, inference settings and hardware:** TODO.
-- **Supporting open-weight models and their roles:** TODO.
+- **Baseline model:** `swiss-ai/Apertus-8B-Instruct-2509`, unchanged weights.
+- **Adapted model:** `swiss-ai/Apertus-8B-2509` (revision 3162c99) → continued pretraining → SFT; full weights (bf16, 16 GB).
+- **Adaptation method:** (1) continued pretraining, 2 epochs, ~44k segments of Swiss insurance text in German and French (Fedlex, Federal Court, FINMA, insurer conditions, specialist press) mixed with general French, 3× H200, DeepSpeed ZeRO-3; (2) supervised fine-tuning, 2 epochs, ~18k conversations in which the assistant plans, calls `web_search`, reads results and answers with quoted sources, mixed with general French conversations, 2× B200.
+- **Serving stack, inference settings and hardware:** Hugging Face Transformers, bf16, greedy decoding, 2048 new tokens per segment, 8192 per question, at most 6 tool rounds; one tool `web_search(query)` executed by Anthropic Claude Haiku web search (top-10 url/title/age). Both systems evaluated on one H200 on 2026-10-16 with identical prompt, tool and settings.
+- **Supporting models:** Claude (Haiku and Sonnet class) for SFT-data generation and as the search executor; an LLM judge for grading (named in `results/judgements.jsonl`).
 
 ----
 ## Use Case Description

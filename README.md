@@ -2,65 +2,75 @@
 
 Hack Apertus Online 2026 · **Track 1B: Swiss Voices — Core Task Intelligence**
 
-Investigating how domain adaptation changes Apertus's factual accuracy on specialised Swiss questions.
+How much does domain adaptation (continued pretraining + supervised fine-tuning) change the factual accuracy of
+Apertus-8B on specialised questions about **Swiss federal private insurance law**, in German and French, when both
+the baseline and the adapted model have the same live web-search tool?
 
-**Status: submission scaffold.** The evaluation dataset, model responses, measured results, final report PDF and evaluation runner still need to be added. This is not a completed submission.
+## Status
 
-## Scope
+| Deliverable | State |
+|---|---|
+| Evaluation dataset: 300 held-out questions (150 DE / 150 FR) | published: [legmlai/swiss-insurance-eval](https://huggingface.co/datasets/legmlai/swiss-insurance-eval) |
+| Model responses, baseline vs adapted, both with live search | generation running on 2026-10-16; pushed to [legmlai/swiss-insurance-eval-responses](https://huggingface.co/datasets/legmlai/swiss-insurance-eval-responses) as they complete |
+| Training-data samples (format only) | [swiss-insurance-sft-sample](https://huggingface.co/datasets/legmlai/swiss-insurance-sft-sample), [swiss-insurance-pt-sample](https://huggingface.co/datasets/legmlai/swiss-insurance-pt-sample) |
+| Evaluation harness (`make run`, Docker) | implemented: `track_1b/src/evaluate.py`, see below |
+| LLM-judge grading + 20 % human audit | pending, runs after the responses are complete |
+| Technical report PDF | draft in `track_1b/technical_report.md`; PDF pending results |
 
-The proposed initial domain is **Swiss federal private insurance law**, in French and German. Confirm this scope against the actual project artifacts before submission. The intended comparison is baseline Apertus and adapted Apertus answering the same held-out questions.
+No scores are claimed until `track_1b/results/results.json` is committed.
 
-The report must distinguish fine-tuning gains from changes in retrieval, tools or prompts. Identify any French-law material used for transfer and evaluate jurisdictional leakage. Separate training, development and evaluation data, and freeze the final benchmark before checkpoint selection.
+## The two systems
 
-## Submission materials
+| | Baseline | Adapted (ours) |
+|---|---|---|
+| Weights | `swiss-ai/Apertus-8B-Instruct-2509` | `swiss-ai/Apertus-8B-2509` → continued pretraining, 2 epochs, ~44k Swiss insurance segments (DE/FR) + general French → SFT, 2 epochs, ~18k search-and-cite conversations + general French |
+| Prompt | identical: Apertus instruct chat template, pinned system date, one tool `web_search(query)` | identical |
+| Search | Anthropic Claude Haiku web search, top-10 results (url, title, age) returned to the model | identical |
+| Decoding | greedy, bf16, 2048 new tokens per segment, 8192 per question, ≤ 6 tool rounds | identical |
 
-- Public GitHub repository, generated from the official template.
-- Public Hugging Face dataset: evaluation cases, model responses and metadata, using the organiser's dataset template. **URL pending.**
-- [`track_1b/technical_report.md`](track_1b/technical_report.md), to be exported as `track_1b/leGML_Report.pdf`: maximum six pages excluding references.
-- End-to-end Docker evaluation launched with `make run`. **Implementation pending.**
-
-Core Task Intelligence requires at least **300 single-turn Q&A pairs with answer variations and source citations**. The organiser's example evaluation uses correct / incorrect / not attempted grading, a random **20% human audit**, and reported judge–human agreement. This is our proposed evaluation plan; no scores or completed review are claimed.
+Everything except the weights is held fixed, so the measured difference is the effect of the adaptation, not of
+retrieval, tools or prompts.
 
 ## Repository layout
 
-The official `track_1b/` directory and its original challenge README and Makefile are retained. Other track directories have been removed.
-
-```text
+```
 track_1b/
-  README.md                 Official challenge requirements
-  technical_report.md       leGML report draft
-  Makefile                  Evaluation entry point; implementation pending
-  .env.example              Required model environment variable names
-  src/                      Public evaluation code, to be added
-  docs/
-    SUBMISSION_CHECKLIST.md
-    EVALUATION_PLAN.md
-    DATASET_CARD_DRAFT.md
-    UPSTREAM.md
-Makefile                    Delegates to track_1b/
-LICENSE                     Apache-2.0 for code
+  README.md               official challenge requirements (unchanged)
+  Makefile                make run / make verify (Docker)
+  Dockerfile, requirements.txt
+  .env.example            LLM_NAME, LLM_BASE_URL, LLM_API_KEY for the judge
+  src/evaluate.py         harness: load datasets, judge, score, verify
+  results/                judgements.jsonl, results.json, results.md (committed once graded)
+  technical_report.md     report source; leGML_Report.pdf once final
+  docs/                   submission checklist, evaluation plan, dataset-card notes
+Makefile                  delegates to track_1b/
 ```
 
 ## Reproduction
 
-The official runner currently exits with an error until the evaluation implementation is added. **`make run` is not yet ready for judges.** Both entry points are reserved for the same Docker workflow:
-
 ```bash
-make run
-# or:
-cd track_1b && make run
+make run          # from the project root; builds the image and runs the harness
 ```
 
-Use `LLM_NAME`, `LLM_BASE_URL` and `LLM_API_KEY` for evaluated endpoints. Record the exact model revision, checkpoint/adapter, prompts, inference settings, code commit and dataset revision. Keep credentials, private training data and unapproved client materials out of this repository.
+- **Without credentials**: re-scores the committed `track_1b/results/judgements.jsonl`, writes
+  `results.recomputed.{json,md}` and verifies them against the committed `results.json`. Deterministic, no GPU, no
+  API. This is the check judges need.
+- **With credentials** (`track_1b/.env`, see `.env.example`: any OpenAI-compatible chat endpoint): additionally
+  judges every response that has no cached judgement, using the SimpleQA rubric
+  (`CORRECT` / `INCORRECT` / `NOT_ATTEMPTED`) in `src/evaluate.py`.
+- `make verify` runs the offline check only.
 
-## Links
-
-- [Official challenge requirements](track_1b/README.md)
-- [Submission checklist](track_1b/docs/SUBMISSION_CHECKLIST.md)
-- [Submission form](https://hackapertus.ch/online-hack/submissions)
-- [Official dataset template](https://huggingface.co/datasets/HackApertus/online_hack_template)
-- [Organiser's terms](https://hackapertus.ch/terms-and-conditions)
+Requirements: Docker; Python 3.12 inside the image; network access to Hugging Face for the datasets. Generating
+model responses (not part of `make run`) needs one 80 GB+ GPU and the search backend; the generation code and
+settings are documented in the dataset cards.
 
 ## Licensing
 
-Code: **Apache-2.0**. Original documentation: **CC-BY-4.0**. Submitted datasets must use **CDLA-Permissive-2.0**, with source-level rights and attribution documented. No dataset or model weights are included here. Existing private leGML repositories are not part of this publication.
+Code: **Apache-2.0**. Documentation: **CC-BY-4.0**. Datasets: **CDLA-Permissive-2.0**, with source-level rights
+documented in the dataset cards. Model weights and the full training corpora are not part of this repository.
+
+## Links
+
+- Official challenge requirements: `track_1b/README.md`
+- Submissions: https://hackapertus.ch/online-hack/submissions
+- Organiser dataset template: https://huggingface.co/datasets/HackApertus/online_hack_template

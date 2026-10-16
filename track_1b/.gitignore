@@ -25,3 +25,6 @@ build/
 .DS_Store
 .idea/
 .vscode/
+results/data/
+results/*.recomputed.*
+.env

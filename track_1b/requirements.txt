@@ -1,0 +1,2 @@
+huggingface_hub>=0.25
+openai>=1.40

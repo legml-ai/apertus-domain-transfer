@@ -1,60 +1,66 @@
-# Hack Apertus — project template
+# leGML — Apertus Domain Knowledge Transfer
 
-Template repository for [Hack Apertus](https://hackapertus.ch/) submissions.
-Every project keeps almost the same layout, so organizers and judges find the
-same things in the same place.
+Hack Apertus Online 2026 · **Track 1B: Swiss Voices — Core Task Intelligence**
 
-## Select your track
+Investigating how domain adaptation changes Apertus's factual accuracy on specialised Swiss questions.
 
-This repository holds one example project per track:
+**Status: submission scaffold.** The evaluation dataset, model responses, measured results, final report PDF and evaluation runner still need to be added. This is not a completed submission.
 
-- `track_1a/`
-- `track_1b/`
-- `track_2a/`
-- `track_2b/`
+## Scope
 
-Keep the directory for the track you are competing in **exactly as it is** —
-don't rename it or move its files — and delete the other track directories.
-That directory is your project root. Keep the files and directories as shown
-below.
+The proposed initial domain is **Swiss federal private insurance law**, in French and German. Confirm this scope against the actual project artifacts before submission. The intended comparison is baseline Apertus and adapted Apertus answering the same held-out questions.
 
-## The structure
+The report must distinguish fine-tuning gains from changes in retrieval, tools or prompts. Identify any French-law material used for transfer and evaluate jurisdictional leakage. Separate training, development and evaluation data, and freeze the final benchmark before checkpoint selection.
 
-| Path | What it is |
-| --- | --- |
-| `README.md` | The challenge description and submission requirements for your track |
-| `technical_report.md` | The deeper write-up: architecture, evaluation, limitations |
-| `Makefile` | `make run` must spin up your project |
-| `src/` | Your code |
-| `data/` | Datasets — `track_1a`, `track_2a` and `track_2b` only; max. 100 MB |
-| `findings/` | Issue files — `track_1a` only |
-| `docs/` | Diagrams, notes, longer write-ups |
+## Submission materials
 
-## Run it
+- Public GitHub repository, generated from the official template.
+- Public Hugging Face dataset: evaluation cases, model responses and metadata, using the organiser's dataset template. **URL pending.**
+- [`track_1b/technical_report.md`](track_1b/technical_report.md), to be exported as `track_1b/leGML_Report.pdf`: maximum six pages excluding references.
+- End-to-end Docker evaluation launched with `make run`. **Implementation pending.**
 
-Judges run `make run` from the root of the project, on a clean checkout:
+Core Task Intelligence requires at least **300 single-turn Q&A pairs with answer variations and source citations**. The organiser's example evaluation uses correct / incorrect / not attempted grading, a random **20% human audit**, and reported judge–human agreement. This is our proposed evaluation plan; no scores or completed review are claimed.
+
+## Repository layout
+
+The official `track_1b/` directory and its original challenge README and Makefile are retained. Other track directories have been removed.
+
+```text
+track_1b/
+  README.md                 Official challenge requirements
+  technical_report.md       leGML report draft
+  Makefile                  Evaluation entry point; implementation pending
+  .env.example              Required model environment variable names
+  src/                      Public evaluation code, to be added
+  docs/
+    SUBMISSION_CHECKLIST.md
+    EVALUATION_PLAN.md
+    DATASET_CARD_DRAFT.md
+    UPSTREAM.md
+Makefile                    Delegates to track_1b/
+LICENSE                     Apache-2.0 for code
+```
+
+## Reproduction
+
+The official runner currently exits with an error until the evaluation implementation is added. **`make run` is not yet ready for judges.** Both entry points are reserved for the same Docker workflow:
 
 ```bash
 make run
+# or:
+cd track_1b && make run
 ```
 
-`make run` is expected to run the project using Docker, since that
-is how the judges will run it.
-- If you used other local open-weight models, include instructions for running the project in your technical report.
-- Use the following environment variables:
-```
-LLM_NAME — name and version of the model
-LLM_BASE_URL — endpoint base URL
-LLM_API_KEY — your API key
-```
+Use `LLM_NAME`, `LLM_BASE_URL` and `LLM_API_KEY` for evaluated endpoints. Record the exact model revision, checkpoint/adapter, prompts, inference settings, code commit and dataset revision. Keep credentials, private training data and unapproved client materials out of this repository.
 
-## Getting started
+## Links
 
-1. Click **Use this template** to create your own repository.
-2. Delete the other track directories. Don't rename or restructure yours.
-3. Read its `README.md` and fill in `technical_report.md`.
-4. Make `make run` work from the root of the project, on a clean checkout.
+- [Official challenge requirements](track_1b/README.md)
+- [Submission checklist](track_1b/docs/SUBMISSION_CHECKLIST.md)
+- [Submission form](https://hackapertus.ch/online-hack/submissions)
+- [Official dataset template](https://huggingface.co/datasets/HackApertus/online_hack_template)
+- [Organiser's terms](https://hackapertus.ch/terms-and-conditions)
 
-## License
+## Licensing
 
-All Hack Apertus projects are open-sourced. Please check our Terms & Conditions for specific licensing details (6. What you build is open source): https://hackapertus.ch/terms-and-conditions
+Code: **Apache-2.0**. Original documentation: **CC-BY-4.0**. Submitted datasets must use **CDLA-Permissive-2.0**, with source-level rights and attribution documented. No dataset or model weights are included here. Existing private leGML repositories are not part of this publication.

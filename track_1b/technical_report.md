@@ -7,7 +7,6 @@
 [swiss-insurance-eval-responses](https://huggingface.co/datasets/legmlai/swiss-insurance-eval-responses) (model responses) ·
 [swiss-insurance-sft-sample](https://huggingface.co/datasets/legmlai/swiss-insurance-sft-sample) ·
 [swiss-insurance-pt-sample](https://huggingface.co/datasets/legmlai/swiss-insurance-pt-sample)
-**Demo video:** {{VIDEO_URL}}
 **Final PDF:** `leGML_Report.pdf`
 
 ----
@@ -67,7 +66,7 @@ The adapted model is a full-weight 8B checkpoint (16 GB, bf16).
 |---|---|
 | Test items | 300 single-turn questions (150 DE, 150 FR) |
 | Ground truth | one sourced reference answer per question, with verbatim quotes and URLs |
-| Model responses | 2 systems × 300 (full transcripts: tool calls, search results, final answer) |
+| Model responses | Planned: 2 systems × 300 (tool calls, search results, final answer); verify completed exports before submission |
 | Question length | median 51 words |
 | Reference length | median ~780 words; median 7 cited URLs; 243/300 references cite at least one URL |
 | Licence | CDLA-Permissive-2.0 |
@@ -90,7 +89,7 @@ The adapted model is a full-weight 8B checkpoint (16 GB, bf16).
   that failed were rejected and are not in the pool.
 - Held-out integrity: 0/300 held-out IDs occur in the training split.
 - Contamination check, in section 3.5.
-- Human audit of the grading on a random 20%, in section 4.3.
+- Human audit of the grading on a random 20%: pending, see section 4.3.
 
 ### 3.4 Provenance and licensing
 
@@ -145,9 +144,11 @@ searched 3 times. Ours searched in {{OURS_SEARCH_RATE}}, with a mean of {{OURS_S
 
 ### 4.3 Human audit
 
-A random 20% of judgements (60, drawn with seed {{AUDIT_SEED}} across both systems) were labelled independently by
-a human annotator ({{AUDITOR}}), who did not see the judge label. Judge–human agreement: {{AGREEMENT}}
-(Cohen's κ {{KAPPA}}). Disagreements and their adjudication are in `results/human_audit.csv`.
+**Pending.** Draw a random 20% of completed judgements with seed {{AUDIT_SEED}}, and have them labelled independently
+by a human annotator ({{AUDITOR}}) who does not see the judge label. If all 600 responses are graded, this requires
+120 audited judgements across the two systems; report the actual sampling frame and coverage. Judge–human
+agreement: {{AGREEMENT}} (Cohen's κ {{KAPPA}}). Add real disagreements and adjudication to `results/human_audit.csv`
+before replacing this paragraph with completed-review results.
 
 ### 4.4 Error analysis
 
@@ -169,7 +170,7 @@ French) law. {{BASE_FOREIGN_LAW_COUNT}}
   all 300. The human audit checks the judge, not the references. A wrong reference makes a correct answer look
   wrong for both systems alike.
 - **Shared style.** Our SFT data and the references come from the same answer format, which could favour our model
-  in the judge's eyes. The rubric scores legal content only, and the human audit measures how much this matters.
+  in the judge's eyes. The rubric scores legal content only; the planned human audit will check grading agreement.
 - **Search is live.** Results depend on the web on 2026-10-16 and are not fully reproducible. All search results
   are stored with the responses, so grading is reproducible.
 - **Temporal validity.** Law and case law change. The set reflects the state of October 2026.
@@ -197,8 +198,9 @@ git clone https://github.com/legml-ai/apertus-domain-transfer && cd apertus-doma
 make run      # Docker; downloads the datasets, re-scores committed judgements, verifies against results.json
 ```
 
-- Without credentials, `make run` is deterministic and needs no GPU or API. It recomputes every score from the
-  committed `results/judgements.jsonl` and checks the result against `results/results.json`.
+- In the final bundle, without credentials, `make run` should recompute every score from committed
+  `results/judgements.jsonl` and compare it with `results/results.json`, without a GPU or API.
+  **Pending:** commit the actual judgements and results, and verify this workflow from a clean checkout.
 - With a judge endpoint in `track_1b/.env` (`LLM_NAME`, `LLM_BASE_URL`, `LLM_API_KEY`, any OpenAI-compatible API),
   it grades any response without a cached judgement. New systems are added by uploading a responses file.
 - Pinned versions: dataset revisions `cc48f5d` and {{RESPONSES_REVISION}}, code commit {{COMMIT}}.

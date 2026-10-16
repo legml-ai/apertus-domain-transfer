@@ -25,7 +25,7 @@
 ## leGML preparation checks
 
 - [x] Confirm domain, languages, exact use case, model revision and adaptation method.
-- [ ] Separate training/development/evaluation data and document contamination checks actually performed.
+- [x] Separate training/development/evaluation data and document contamination checks actually performed (docs/CONTAMINATION.md).
 - [x] Identify retrieval, tool, prompt and inference differences between compared systems.
 - [x] Remove secrets, personal data, private engine code and materials without publication rights.
 - [ ] Verify the submitted commit from a clean checkout with Docker and dataset access.

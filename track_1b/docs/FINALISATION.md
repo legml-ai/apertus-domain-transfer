@@ -12,6 +12,10 @@ https://hackapertus.ch/online-hack/submissions
 - GitHub: https://github.com/legml-ai/apertus-domain-transfer
 - Hugging Face: https://huggingface.co/datasets/legmlai/swiss-insurance-eval
 - Include the responses link in the optional message: https://huggingface.co/datasets/legmlai/swiss-insurance-eval-responses
+- Model weights: https://huggingface.co/legmlai/apertus-8b-swiss-insurance
+- SFT sample: https://huggingface.co/datasets/legmlai/swiss-insurance-sft-sample
+- Pretraining sample: https://huggingface.co/datasets/legmlai/swiss-insurance-pt-sample
+- All five project repositories are public. Checked revisions and current contents: [HF_LINKS.md](HF_LINKS.md).
 - Final attachment: `leGML_Report.pdf`, maximum six pages excluding references.
 - No demo video field is required on the Track 1B Core Task Intelligence form.
 - To include an optional video, paste a watchable URL in **Your message (optional)**. Verify that judges can open it without requesting access; the same URL can be added to the report.

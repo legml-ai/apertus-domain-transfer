@@ -10,6 +10,7 @@ the baseline and the adapted model have the same live web-search tool?
 
 | Deliverable | State |
 |---|---|
+| Adapted model weights | public: [legmlai/apertus-8b-swiss-insurance](https://huggingface.co/legmlai/apertus-8b-swiss-insurance); all four safetensors shard URLs checked |
 | Evaluation dataset: 300 held-out questions (150 DE / 150 FR) | published: [legmlai/swiss-insurance-eval](https://huggingface.co/datasets/legmlai/swiss-insurance-eval) |
 | Model responses, baseline vs adapted, both with live search | generation running on 2026-10-16; pushed to [legmlai/swiss-insurance-eval-responses](https://huggingface.co/datasets/legmlai/swiss-insurance-eval-responses) as they complete |
 | Training-data samples (format only) | [swiss-insurance-sft-sample](https://huggingface.co/datasets/legmlai/swiss-insurance-sft-sample), [swiss-insurance-pt-sample](https://huggingface.co/datasets/legmlai/swiss-insurance-pt-sample) |
@@ -18,6 +19,8 @@ the baseline and the adapted model have the same live web-search tool?
 | Technical report PDF | draft in `track_1b/technical_report.md`; PDF pending results |
 
 No scores are claimed until `track_1b/results/results.json` is committed.
+
+The five project Hugging Face repositories are public. See [verified resource links](track_1b/docs/HF_LINKS.md) for checked revisions and file availability. The responses repository still contains its card only at the checked revision; the public evaluation questions contain reference hashes, not reference answers.
 
 ## Demo video
 

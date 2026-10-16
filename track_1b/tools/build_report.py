@@ -45,6 +45,7 @@ def render(source: Path, output: Path, final: bool = False) -> None:
                               leading=12.1, spaceAfter=5, splitLongWords=True))
     styles.add(ParagraphStyle(name='ReportSmall', parent=styles['ReportBody'],
                               fontSize=7.4, leading=9.5, spaceAfter=0))
+    styles.add(ParagraphStyle(name='ReportLead', parent=styles['ReportBody'], keepWithNext=True))
     styles.add(ParagraphStyle(name='ReportTitle', fontName='Helvetica-Bold', fontSize=19,
                               leading=22, textColor=GREEN, spaceAfter=10))
     styles.add(ParagraphStyle(name='ReportH2', fontName='Helvetica-Bold', fontSize=12,
@@ -127,6 +128,8 @@ def render(source: Path, output: Path, final: bool = False) -> None:
             content = ' '.join(block)
             if content.startswith('- '):
                 content = '- ' + content[2:]
+            if re.fullmatch(r'\*\*[^*]+\*\*', content):
+                style = styles['ReportLead']
             story.append(Paragraph(inline(content), style))
             continue
         story.append(Paragraph(inline(content), style))

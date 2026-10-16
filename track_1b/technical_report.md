@@ -4,6 +4,7 @@
 **Team:** leGML — Mohamad Alhajar
 **Repository:** https://github.com/legml-ai/apertus-domain-transfer
 **Demo video:** [Watch the demo](https://drive.google.com/file/d/1M0_HGipQ7kq1pfYyo4aU-OVESDTRK8ht/view?usp=sharing)
+**Model weights:** [legmlai/apertus-8b-swiss-insurance](https://huggingface.co/legmlai/apertus-8b-swiss-insurance)
 **Datasets:** [swiss-insurance-eval](https://huggingface.co/datasets/legmlai/swiss-insurance-eval) (questions, metadata, contamination check) ·
 [swiss-insurance-eval-responses](https://huggingface.co/datasets/legmlai/swiss-insurance-eval-responses) (model responses) ·
 [swiss-insurance-sft-sample](https://huggingface.co/datasets/legmlai/swiss-insurance-sft-sample) ·
@@ -57,7 +58,10 @@ retrieval, tools or prompts.
    legal claim, and say explicitly what could not be found. The format is shown in
    [swiss-insurance-sft-sample](https://huggingface.co/datasets/legmlai/swiss-insurance-sft-sample).
 
-The adapted model is a full-weight 8B checkpoint (16 GB, bf16).
+The adapted model is a full-weight 8B checkpoint (16 GB, bf16), published at
+[legmlai/apertus-8b-swiss-insurance](https://huggingface.co/legmlai/apertus-8b-swiss-insurance), checked revision
+`764b574b127dfa4498dd1c394b78a14f0b9d97f4`. The index reports 16,106,676,480 weight bytes across four safetensors shards.
+All four shard URLs returned HTTP 200 anonymously. This verifies file availability, not inference quality.
 
 ## 3. Dataset
 

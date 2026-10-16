@@ -3,6 +3,7 @@
 **Track:** Hack Apertus Online 2026 — Track 1B, Swiss Voices / Core Task Intelligence
 **Team:** leGML — Mohamad Alhajar
 **Repository:** https://github.com/legml-ai/apertus-domain-transfer
+**Demo video:** [Watch the demo](https://drive.google.com/file/d/1M0_HGipQ7kq1pfYyo4aU-OVESDTRK8ht/view?usp=sharing)
 **Datasets:** [swiss-insurance-eval](https://huggingface.co/datasets/legmlai/swiss-insurance-eval) (questions, metadata, contamination check) ·
 [swiss-insurance-eval-responses](https://huggingface.co/datasets/legmlai/swiss-insurance-eval-responses) (model responses) ·
 [swiss-insurance-sft-sample](https://huggingface.co/datasets/legmlai/swiss-insurance-sft-sample) ·

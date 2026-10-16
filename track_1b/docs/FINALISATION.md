@@ -15,6 +15,7 @@ https://hackapertus.ch/online-hack/submissions
 - Final attachment: `leGML_Report.pdf`, maximum six pages excluding references.
 - No demo video field is required on the Track 1B Core Task Intelligence form.
 - To include an optional video, paste a watchable URL in **Your message (optional)**. Verify that judges can open it without requesting access; the same URL can be added to the report.
+- Demo video: https://drive.google.com/file/d/1M0_HGipQ7kq1pfYyo4aU-OVESDTRK8ht/view?usp=sharing
 - Use the original Devpost registration email. Participant contact details are kept out of this public repository.
 
 ## Resolve before the final click

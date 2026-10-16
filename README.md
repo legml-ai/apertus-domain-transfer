@@ -19,6 +19,10 @@ the baseline and the adapted model have the same live web-search tool?
 
 No scores are claimed until `track_1b/results/results.json` is committed.
 
+## Demo video
+
+[Watch the leGML Hack Apertus demo](https://drive.google.com/file/d/1M0_HGipQ7kq1pfYyo4aU-OVESDTRK8ht/view?usp=sharing).
+
 ## The two systems
 
 | | Baseline | Adapted (ours) |
